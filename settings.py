@@ -7,6 +7,7 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+
 MANAGERS = ADMINS
 from pymongo import Connection
 connection = Connection('localhost', 27017)
