@@ -1,0 +1,45 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia %}
+
+{% block extrahead %}{{ block.super }}
+{% url admin:jsi18n as jsi18nurl %}
+<script type="text/javascript" src="{{ADMIN_PATH}}jsi18n/"></script>
+<script type="text/javascript" src= "{{ MEDIA_URL }}scripts/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/core.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/admin/RelatedObjectLookups.js"></script>
+
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.min.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/jquery.init.js"></script>
+<script type="text/javascript" src="{% admin_media_prefix %}js/actions.min.js"></script>
+<script>
+</script>
+{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% admin_media_prefix %}css/forms.css" />{% endblock %}
+{% block breadcrumbs %}
+<div class = breadcrumbs>
+</div>
+{% endblock %}
+{% block content %}
+<h1>JSON to Mongo</h1>
+<div id="content-main">
+    <div>
+        <fieldset class="module aligned ">
+            <h2>JSON Details</h2>
+        <form  action="{% url create_db %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+        <div class="form-row">
+        <label class="required">Collection Name:</label>                
+        <input type="text" size="25" name="id_collection" id="id_collection" value=""/>
+        </div>
+        <div class="form-row">
+        <label class="required">JSON File:</label>   
+        <input type="file" id="id_json" name="id_json" val=""/>          
+        </div>
+        <div class="submit-row">
+        <input type="submit" class="default" value="Submit JSON Data" />
+        </div>
+        </form>
+    </fieldset>
+    </div>
+</div>
+{% endblock %}
