@@ -31,7 +31,7 @@ class CreateMongoCollection( object ):
     def create_content( self, json_dump ):
         json_list = list( json_dump )
         col_obj=CollectionMapping('mongo_content')
-        if not  col_obj.find( { "collection_name":self.collection_name} ):
+        if not  col_obj.find_one( { "collection_name":self.collection_name} ):
             col_obj.load_json( { "collection_name":self.collection_name, "key_names":{}} )
         keys_dict = {}
         for each in json_list:

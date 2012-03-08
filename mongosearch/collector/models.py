@@ -23,3 +23,11 @@ class CollectionMapping(CollectionWrapper):
     def __init__(self,model):
         self.db_col = db[model]
     
+class CollectionContentType(CollectionWrapper):    
+    
+    def __init__(self):
+        self.db_col = db['mongo_content']
+        
+    def collection_keys(self,collection_name):
+        self.db_col.find({'collection_name':collection_name}).key_names
+        
