@@ -1,5 +1,5 @@
 import pymongo
-from mongosearch.collector.models import CollectionMapping
+from mongosearch.collector.models import CollectionMapping, CollectionContentType
 import settings
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response
@@ -30,7 +30,7 @@ class CreateMongoCollection( object ):
 
     def create_content( self, json_dump ):
         json_list = list( json_dump )
-        col_obj=CollectionMapping('mongo_content')
+        col_obj=CollectionContentType()
         if not  col_obj.find_one( { "collection_name":self.collection_name} ):
             col_obj.load_json( { "collection_name":self.collection_name, "key_names":{}} )
         keys_dict = {}
@@ -51,5 +51,5 @@ class CreateMongoCollection( object ):
                 previous_keys[new_key] = keys_dict[new_key]
         row_data = col_obj.find_one( { "collection_name":self.collection_name} )
         row_data['key_names'] = previous_keys
-        col_obj.save( row_data )
+        col_obj.update( { "collection_name":self.collection_name} ,{"$set":{'keys_name':previous_keys}} )
         

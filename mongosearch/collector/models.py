@@ -18,6 +18,9 @@ class CollectionWrapper(object):
     def save(self,kwargs):
         self.db_col.find(kwargs)
     
+    def update(self,find_dict,set_dict):
+        self.db_col.update(find_dict,set_dict)
+    
 class CollectionMapping(CollectionWrapper):
 
     def __init__(self,model):
