@@ -31,7 +31,6 @@ class AppSearch(object):
         """ gets list of apps present in your content type """
         ct_list=[]
         for collection in CollectionContentType().find({}):
-            print collection
             ct_list.append((collection['_id'],collection['collection_name']))
         return ct_list
     
@@ -83,8 +82,13 @@ class AppSearch(object):
     
     def build_data(self,model_id):
         self.field_list=map(lambda x:x[0],self.get_model_meta(model_id,'display_fields'))
-        print self.field_list
-        self.data_list=self.data_list.values_list(*map(lambda x:x[0],self.field_list))
+        self.generic_list=[]
+        for data in self.data_list:
+            temp_list=[]
+            for field in self.field_list:
+
+                    temp_list.append(data.get(field))
+            self.generic_list.append(temp_list)             
        
     @staticmethod         
     def get_model_all_fields( model_id ):
