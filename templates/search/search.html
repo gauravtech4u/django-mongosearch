@@ -4,14 +4,14 @@
 <script>
 $(function(){
   $("select#id_models").change(function(){
-    $.getJSON("/search/filters/",{id: $(this).val(), ajax: 'true'}, function(j){
+    $.getJSON("{% url appfilter %}",{id: $(this).val(), ajax: 'true'}, function(j){
       var options = '';
       for (var i = 0; i < j.length; i++) {
         options += '<option value="' + j[i][0]+ '">' + j[i][1] + '</option>';
       }
       $("select#id_filters").html(options);
     })
-    $.get('/search/constraint/',{id: $(this).val()},function(data){$('#constraint_div').html(data)}); 
+    $.get('{% url appconstraint %}',{id: $(this).val()},function(data){$('#constraint_div').html(data)}); 
   })
 })
 
