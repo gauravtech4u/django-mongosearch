@@ -56,32 +56,34 @@ class AppSearch(object):
     
     def build_query(self):
         """ prepares query for searching """
-        content_type = ContentType.objects.get( id = self.request.POST.get('models') )
-        model_obj = get_model( content_type.app_label, content_type.model )
-        query=self.constraint_dict.popitem()
-        query=Q(**{query[1][1]+'__icontains':query[0]})
+        collection_id = self.request.POST.get('models')
+        ct_obj=CollectionContentType()
+        collection_name=ct_obj.find_one({'_id':ObjectId(collection_id)})['collection_name']
+        collection_obj=CollectionMapping(collection_name)
+        self.data_list=[]
         for key,value in self.constraint_dict.items():
-            if value[0] == '|':
-                query|=Q(**{value[1]+'__icontains':key})
-            else:
-                query&=Q(**{value[1]+'__icontains':key})
-        self.data_list=model_obj.objects.filter(query)            
+            for data in collection_obj.find({key:value}):
+                self.data_list.append(data)
             
     def add_contraint(self):
         """ gets additional constraint AND/OR """
         constraint_count=self.request.POST.get('searchform-TOTAL_FORMS')
         search_term=self.request.POST.get('term')
         filters=self.request.POST.get('filters')
-        self.constraint_dict={search_term:['&',filters]}
+        self.constraint_dict={'$and':[{filters:search_term}],}
         for i in range(0,int(constraint_count)):
             constraint=self.request.POST.get('searchform-'+str(i)+'-contraint')
             term=self.request.POST.get('searchform-'+str(i)+'-term')
             filters=self.request.POST.get('searchform-'+str(i)+'-filters')
-            self.constraint_dict.update({term:[constraint,filters]})
+            if self.constraint_dict.get(constraint):
+                self.constraint_dict[constraint].append({filters:term})
+            else:
+                self.constraint_dict[constraint]=[{filters:term}]
         self.build_query()
     
     def build_data(self,model_id):
-        self.field_list=self.get_model_meta(model_id,'display_fields')
+        self.field_list=map(lambda x:x[0],self.get_model_meta(model_id,'display_fields'))
+        print self.field_list
         self.data_list=self.data_list.values_list(*map(lambda x:x[0],self.field_list))
        
     @staticmethod         
@@ -96,9 +98,9 @@ class AppSearch(object):
     def get_model_meta( model_id,field_type='search_fields' ):
         """ takes model id as param and returns list of fileds """
         collection_obj=CollectionContentType()
-        model_fields=[]        
-        for key,value in collection_obj.find_one({'_id':ObjectId(model_id)})['key_names']:
-            model_field.append([key,key])
+        model_fields=[]
+        for key,value in collection_obj.find_one({'_id':ObjectId(model_id)})['keys_name'].items():
+            model_fields.append([key,key])
         return model_fields
         
     
@@ -124,7 +126,7 @@ class AjaxFillFields(TemplateView,AppSearch):
         
 class AjaxConstraint(TemplateView,AppSearch):
 
-    template_name="appsearch/constraint.html"
+    template_name="search/constraint.html"
     
     def get_context_data(self,**kwargs):
         formset=self.add_constraint_formset()
