@@ -34,10 +34,10 @@ $(function(){
 <table>
     <tr>
         {% for field in field_list %}
-            <th>{{field.1}}</th>
+            <th>{{field}}</th>
         {% endfor %}
     </tr>
-    {% for data in data_list %}
+    {% for data in generic_list %}
     <tr>
         {% for field_data in data %}
             <td>{{field_data}}</td>
