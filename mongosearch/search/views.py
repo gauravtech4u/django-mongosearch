@@ -61,6 +61,7 @@ class AppSearch(object):
         collection_obj=CollectionMapping(collection_name)
         self.data_list=[]
         for key,value in self.constraint_dict.items():
+            print collection_obj.find_one({})
             for data in collection_obj.find({key:value}):
                 self.data_list.append(data)
             
@@ -86,13 +87,11 @@ class AppSearch(object):
         for data in self.data_list:
             temp_list=[]
             for field in self.field_list:
-
                     temp_list.append(data.get(field))
             self.generic_list.append(temp_list)             
        
     @staticmethod         
     def get_model_all_fields( model_id ):
-        
         content_type = ContentType.objects.get( id = model_id )
         model_obj = get_model( content_type.app_label, content_type.model )
         model_fields = model_obj._meta.fields
@@ -103,7 +102,7 @@ class AppSearch(object):
         """ takes model id as param and returns list of fileds """
         collection_obj=CollectionContentType()
         model_fields=[]
-        for key,value in collection_obj.find_one({'_id':ObjectId(model_id)})['keys_name'].items():
+        for key in collection_obj.find_one({'_id':ObjectId(model_id)})['key_names']:
             model_fields.append([key,key])
         return model_fields
         
