@@ -12,9 +12,9 @@ from django.utils import simplejson as json
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.base import TemplateResponseMixin, View
-#from forms import ConstraintForm, SearchForm
+from forms import ConstraintForm, SearchForm
 from mongosearch.collector.models import CollectionMapping, CollectionContentType
-#from bson.objectid import ObjectId
+from bson.objectid import ObjectId
 
 def  criteria( request ):
     obj = MongoSearch( request ).criteria()

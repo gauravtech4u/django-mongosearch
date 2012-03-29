@@ -1,5 +1,4 @@
 from django.conf.urls.defaults import patterns , url
-<<<<<<< HEAD
 from views import *
 
 urlpatterns = patterns( '',
