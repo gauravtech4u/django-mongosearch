@@ -7,10 +7,10 @@ PROJECT_DIR = os.path.dirname( __file__ )
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
+ADMINS = ( 
     # ('Your Name', 'your_email@example.com'),
-)
-
+ )
+ADMIN_PATH = '/admin/'
 DATABASE_ENGINE = ''
 DATABASE_NAME = ''
 DATABASE_USER = ''
@@ -18,15 +18,7 @@ DATABASE_PASSWORD = ''
 DATABASE_HOST = ''
 DATABASE_PORT = ''
 
-from pymongo import Connection
-
-connection = Connection('localhost', 27017)
-
-db = connection.test_database
-
 MANAGERS = ADMINS
-
-DB_CONNECTION='localhost'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -53,12 +45,12 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join( PROJECT_DIR, 'media' ).replace( '\\', '/' )
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash.
-# Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+# trailing slash if there is a path component (optional in other cases).
+# Examples: "http://media.lawrence.com", "http://example.com/media/"
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -76,19 +68,19 @@ STATIC_URL = '/static/'
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 # Additional locations of static files
-STATICFILES_DIRS = (
+STATICFILES_DIRS = ( 
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-)
+ )
 
 # List of finder classes that know how to find static files in
 # various locations.
-STATICFILES_FINDERS = (
+STATICFILES_FINDERS = ( 
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 #    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
+ )
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '@(tg$re=l7okfq7mhahy(yxmj$ad9y7-&c3ny5$aw*=--6)&%+'
@@ -102,11 +94,11 @@ TEMPLATE_DIRS = (
  )
 
 # List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
+TEMPLATE_LOADERS = ( 
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
-)
+ )
 
 TEMPLATE_CONTEXT_PROCESSORS = ( 
     'django.core.context_processors.auth',
@@ -114,19 +106,20 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.i18n',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
+    'mongosearch.search.context_processors.adminpath',
  )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = ( 
     'django.middleware.common.CommonMiddleware',
     #'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     #'django.contrib.auth.middleware.AuthenticationMiddleware',
-)
+ )
 
-ROOT_URLCONF = 'search.urls'
+ROOT_URLCONF = 'urls'
 
 
-INSTALLED_APPS = (
+INSTALLED_APPS = ( 
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -135,11 +128,12 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'mongosearch.collector',
     'mongosearch.core',
+    'mongosearch.search',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-)
+ )
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
