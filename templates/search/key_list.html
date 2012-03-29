@@ -1,0 +1,22 @@
+<h2>Search Details</h2><br/>
+{% for each in keys_name %}
+	<div class="inline-group" id="intfield_set-group">
+		<h2>{{each}}</h2>
+		<input type="hidden" name="key_{{forloop.counter}}" value="{{each}}" />
+		<div class="inline-related">
+		    <fieldset class="module aligned ">
+		        <div class="form-row location">
+		            <div>
+		               <select name="filter_{{forloop.counter}}">
+		                  <option value="">No Criteria</option>
+		                    {% for search_opt in search_set %}
+		                        <option value="{{search_opt.0}}">{{search_opt.1}}</option>
+		                    {% endfor %}
+		               </select>
+		               Criteria<input type="text" value=""/>
+		            </div>            
+		        </div>
+		</fieldset>
+		</div>
+	</div>
+{% endfor %}
