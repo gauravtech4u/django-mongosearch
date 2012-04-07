@@ -85,11 +85,15 @@ class AppSearch( object ):
         constraint_count = self.request.POST.get( 'searchform-TOTAL_FORMS' )
         search_term = self.request.POST.get( 'term' )
         filters = self.request.POST.get( 'filters' )
+        if self.request.POST.get('constraint' ):
+            search_term={self.request.POST.get('constraint' ):int(search_term)}
         self.constraint_dict = {'$and':[{filters:search_term}], }
         for i in range( 0, int( constraint_count ) ):
             constraint = self.request.POST.get( 'searchform-' + str( i ) + '-contraint' )
             term = self.request.POST.get( 'searchform-' + str( i ) + '-term' )
             filters = self.request.POST.get( 'searchform-' + str( i ) + '-filters' )
+            if self.request.POST.get('searchform-' + str( i ) + '-add_constraint' ):
+                term={self.request.POST.get('searchform-' + str( i ) + '-add_constraint' ):int(term)}
             if self.constraint_dict.get( constraint ):
                 self.constraint_dict[constraint].append( {filters:term} )
             else:
@@ -114,11 +118,11 @@ class AppSearch( object ):
 
     @staticmethod
     def get_model_meta( model_id, field_type = 'search_fields' ):
-        """ takes model id as param and returns list of fileds """
+        """ takes model id as param and returns list of fields """
 
         collection_obj = CollectionContentType()
         model_fields = []
-        for key, value in collection_obj.find_one( {'_id':ObjectId( model_id )} )['keys_name'].items():
+        for key,value in collection_obj.find_one( {'_id':ObjectId( model_id )} )['keys_name'].items():
             model_fields.append( [key, key] )
         return model_fields
         

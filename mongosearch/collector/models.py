@@ -14,6 +14,9 @@ class CollectionWrapper( object ):
     def save( self, kwargs ):
         self.db_col.find( kwargs )
         
+    def update( self, find_dict, set_dict ):
+        self.db_col.update( find_dict, set_dict )
+        
     @classmethod 
     def collection_names( self ):
         return db.collection_names()
@@ -25,9 +28,6 @@ class CollectionMapping( CollectionWrapper ):
     
     def save( self, kwargs ):
         self.db_col.find( kwargs )
-    
-    def update( self, find_dict, set_dict ):
-        self.db_col.update( find_dict, set_dict )
     
     
 class CollectionContentType( CollectionWrapper ):    
