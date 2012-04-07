@@ -1,0 +1,17 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>This is Homepage.</title>
+</head>
+<body>
+{% if user.is_authenticated %}
+    <a href="/account/logout/?next=/">Logout</a>
+    <p>Welcome {{ user.first_name }}</p>
+{% else %}
+    <a href="/account/login/">Login</a><br/>
+    <a href="{% url register %}">Register</a>
+{% endif %} <br/>
+
+</body>
+</html>
