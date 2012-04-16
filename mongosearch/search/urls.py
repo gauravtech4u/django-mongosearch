@@ -16,5 +16,7 @@ urlpatterns = patterns( '',
          url( r'^get-keys/$', 'get_keys' , name = 'get_keys' ),
          
          url( r'^filter-results/$', 'filter_results' , name = 'filter_results' ),
+         
+         url( r'^edit-record/(?P<model_name>[-\S]+)/(?P<id>[-\S]+)/$', EditRecord.as_view() , name = 'edit_record' ),
 
  )

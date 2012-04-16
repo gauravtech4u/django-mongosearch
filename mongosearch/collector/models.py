@@ -1,4 +1,5 @@
 from mongosearch.core.connection import db
+from mongosearch.core.queryset import QuerySetManager
 
 class CollectionWrapper( object ):
  
@@ -20,21 +21,28 @@ class CollectionWrapper( object ):
     @classmethod 
     def collection_names( self ):
         return db.collection_names()
+        
     
 class CollectionMapping( CollectionWrapper ):
 
+    db_col=None
+    
     def __init__( self, model ):
         self.db_col = db[model]
+        self.objects=QuerySetManager(self.db_col)
     
     def save( self, kwargs ):
         self.db_col.find( kwargs )
-    
+
     
 class CollectionContentType( CollectionWrapper ):    
     
     def __init__( self ):
         self.db_col = db['mongo_content']
+        self.objects=QuerySetManager(self.db_col)
         
     def collection_keys( self, collection_name ):
         self.db_col.find( {'collection_name':collection_name} ).key_names
         
+
+    
