@@ -28,3 +28,6 @@ class ConstraintForm(forms.Form):
     add_constraint  =   forms.ChoiceField(label="Additional Constraint",choices=ALLOWED_CONSTRAINTS)
     filters         =   forms.ChoiceField(label="filter by",choices=[])
     term            =   forms.CharField(label="Search Term") 
+
+class EditForm(forms.Form):
+    pass

@@ -12,7 +12,7 @@ from django.utils import simplejson as json
 from django.shortcuts import render
 from django.views.generic import TemplateView, ListView, DetailView
 from django.views.generic.base import TemplateResponseMixin, View
-from forms import ConstraintForm, SearchForm
+from forms import ConstraintForm, SearchForm, EditForm
 from mongosearch.collector.models import CollectionMapping, CollectionContentType
 from bson.objectid import ObjectId
 
@@ -30,9 +30,7 @@ def filter_results( request ):
 
 # add models to be displayed for search
 ALLOWED_MODELS = {
-        'sampleset':{'search_fields':[( 'group__name', 'group' )], 'display_fields':[( 'name', 'name' )]},
-        'checklist':{'search_fields':[( 'name', 'name' ), ( 'group__name', 'group' )], 'display_fields':[( 'name', 'name' )]},
-        'company':{'search_fields':[( 'name', 'name' ), ( 'company_type', 'company type' )], 'display_fields':[( 'name', 'name' ), ( 'office_phone', 'office phone' )]},
+        'test':{'search_fields':[( 'group__name', 'group' )], 'display_fields':[( 'app_type', 'App Type' ),('amount','Amount'),('email','Email'),('registration_no','Registration Number')]},
         }
 
 class Data( object ):
@@ -53,14 +51,14 @@ class AppSearch( object ):
         
         model_id, field_list = self.request.GET.get( 'id' ), []
         if model_id:
-            field_list = self.get_model_meta( model_id )
+            model_name,field_list = self.get_model_meta( model_id )
         return json.dumps( field_list, separators = ( ',', ':' ) )
     
     def add_constraint_formset( self ):
         """ add constraint formset """
         model_id, field_list = self.request.GET.get( 'id' ), []
         if model_id:
-            field_list = self.get_model_meta( model_id )
+            model_name,field_list = self.get_model_meta( model_id )
         ConstraintFormSet = formset_factory( ConstraintForm )
         formset = ConstraintFormSet( prefix = "searchform" )
         for form in formset:
@@ -74,10 +72,7 @@ class AppSearch( object ):
         ct_obj = CollectionContentType()
         collection_name = ct_obj.find_one( {'_id':ObjectId( collection_id )} )['collection_name']
         collection_obj = CollectionMapping( collection_name )
-        self.data_list = []
-        for key, value in self.constraint_dict.items():
-            for data in collection_obj.find( {key:value} ):
-                self.data_list.append( data )
+        self.data_list = collection_obj.objects.filter(self.constraint_dict)
 
             
     def add_contraint( self ):
@@ -100,14 +95,25 @@ class AppSearch( object ):
                 self.constraint_dict[constraint] = [{filters:term}]
         self.build_query()
     
+    def get_display_fields(self,model_id=None):
+        
+        self.collection_name,field_list= self.get_model_meta( model_id, 'display_fields' )
+        if ALLOWED_MODELS.get(self.collection_name):
+            field_list=ALLOWED_MODELS[self.collection_name]['display_fields']
+        return field_list
+    
     def build_data( self, model_id ):
-        self.field_list = map( lambda x:x[0], self.get_model_meta( model_id, 'display_fields' ) )
+        self.field_list=self.get_display_fields(model_id)
         self.generic_list = []
+        print self.data_list
         for data in self.data_list:
             temp_list = []
-            for field in self.field_list:
-                    temp_list.append( data.get( field ) )
-            self.generic_list.append( temp_list )             
+            for field,field_name in self.field_list:
+                try:
+                    temp_list.append( data.__getattribute__( field ) )
+                except:pass
+            self.generic_list.append( (data._id,temp_list) )
+        self.display_fields=map(lambda x:x[1],self.field_list)
        
     @staticmethod         
     def get_model_all_fields( model_id ):
@@ -122,9 +128,10 @@ class AppSearch( object ):
 
         collection_obj = CollectionContentType()
         model_fields = []
-        for key,value in collection_obj.find_one( {'_id':ObjectId( model_id )} )['keys_name'].items():
-            model_fields.append( [key, key] )
-        return model_fields
+        col_data=collection_obj.find_one( {'_id':ObjectId( model_id )} )
+        for key,value in col_data['key_names'].items():
+            model_fields.append( [key,key] )
+        return (col_data['collection_name'],model_fields)
         
     
 class ModelListing( TemplateView, AppSearch ):
@@ -154,3 +161,12 @@ class AjaxConstraint( TemplateView, AppSearch ):
     def get_context_data( self, **kwargs ):
         formset = self.add_constraint_formset()
         return {'formset':formset }
+
+class EditRecord(TemplateView,AppSearch):
+    template_name = "search/edit_data.html"
+    
+    def get_context_data( self, **kwargs ):
+        form=EditForm()
+        collection_name=self.kwargs.get('model_name')
+        collection_obj = CollectionMapping( collection_name )
+        return {'form':form }  

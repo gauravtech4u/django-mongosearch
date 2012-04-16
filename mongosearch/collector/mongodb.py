@@ -6,12 +6,26 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 import json
 
+RECORD_IDENTIFIER={'MBA':'app_id'}
+
 class CreateMongoCollection( object ):
     
     request = ""
     
     def __init__( self , request ):
-        self.request = request 
+        self.request = request
+        
+    def upload_json( self ):
+
+        json_dict=self.request.POST.get('data')
+        json_dump = json.loads( json_dict )
+
+        for key,value in json_dump.items():
+            self.collection_name=key
+            self.create_content( value )
+            col_obj = CollectionMapping( key)
+            col_obj.load_json( value )
+        return HttpResponse( 'File Uploaded' )
         
     def create_db( self ):
         self.collection_name = self.request.POST['id_collection']
@@ -49,5 +63,16 @@ class CreateMongoCollection( object ):
                 previous_keys[new_key] = keys_dict[new_key]
         row_data = col_obj.find_one( { "collection_name":self.collection_name} )
         row_data['key_names'] = previous_keys
-        col_obj.update( { "collection_name":self.collection_name} , {"$set":{'keys_name':previous_keys}} )
+        col_obj.update( { "collection_name":self.collection_name} , {"$set":{'key_names':previous_keys}} )
         
+    def update_db(self):
+        json_dict=self.request.POST.get('data')
+        json_dump = json.loads( json_dict )
+        print json_dump,"====="
+        for key,value_dict in json_dump.items():
+                print key
+                obj=CollectionMapping(key)
+                for app_id,update_dict in value_dict.items():
+                    print {'app_id':app_id},update_dict
+                    obj.objects.update({'app_id':app_id},update_dict)
+
