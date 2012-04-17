@@ -3,7 +3,7 @@
 <script type="text/javascript" src="{{STATIC_URL}}js/jquery-1.7.1.js"></script>
 <script>
 $(function(){
-  $("select#id_models").change(function(){
+  $("select#id_models").click(function(){
     $.getJSON("{% url appfilter %}",{id: $(this).val(), ajax: 'true'}, function(j){
       var options = '';
       for (var i = 0; i < j.length; i++) {
@@ -33,12 +33,14 @@ $(function(){
 {{model_obj}}
 <table>
     <tr>
-        {% for field in field_list %}
+        <th>Select</th>
+        {% for field in display_fields %}
             <th>{{field}}</th>
         {% endfor %}
     </tr>
-    {% for data in generic_list %}
+    {% for id,data in generic_list %}
     <tr>
+        <td><a href="{% url edit_record collection_name id %}">Edit</a></td>
         {% for field_data in data %}
             <td>{{field_data}}</td>
         {% endfor %}
