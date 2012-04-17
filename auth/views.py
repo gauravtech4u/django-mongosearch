@@ -1,13 +1,14 @@
-import urlparse
+import urlparse, json
 
 from django.conf import settings
 from django.shortcuts import redirect, render_to_response
 from django.template.context import RequestContext
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
+
 
 from forms import RegistrationForm
 from models import User as MongoUser
@@ -16,11 +17,9 @@ def _update_user(new_user, **kwargs):
     """
     method to update user data after registration
     """
-    new_user.first_name = kwargs.get('first_name')
-    new_user.last_name = kwargs.get('last_name')
-    new_user.is_staff = kwargs.get('is_staff', False)
-    new_user.is_active = kwargs.get('is_active', True)
-    new_user.is_superuser = kwargs.get('is_superuser', False)
+    for key, value in kwargs.items():
+        if key not in ['username', 'password1', 'email', 'password', 'password2']:
+            new_user.__setattr__(key, value)
     new_user.save()
     return new_user
 
@@ -97,3 +96,29 @@ def login(request, template_name='registration/login.html',
     context.update(extra_context or {})
     return render_to_response(template_name, context,
         context_instance=RequestContext(request, current_app=current_app))
+
+class CreateUpdateUser(object):
+    def __init__( self , request ):
+        self.request = request
+
+    def create_update_user(self):
+        json_dict = self.request.POST.get('data')
+        json_dump = json.loads( json_dict )
+
+        username = json_dump.get('username')
+        existing = MongoUser.objects(username=username)
+        if existing:
+            user = existing[0]
+            for key, value in json_dump.items():
+                user.__setattr__(key, value)
+            user.save()
+        else:
+            user = MongoUser()
+            for key, value in json_dump.items():
+                user.__setattr__(key, value)
+            user.save()
+        return HttpResponse(True)
+
+
+def update_create_user(request):
+    return CreateUpdateUser(request).create_update_user()
