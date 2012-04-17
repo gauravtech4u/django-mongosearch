@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from mongosearch.search.genericsearch import MongoSearch
 
 from django import forms
@@ -39,10 +41,10 @@ class Data( object ):
 class AppSearch( object ):    
     """ Provides Basic Functions for app search """    
     
-    def get_app_models( self ):
+    def get_app_models( self, user ):
         """ gets list of apps present in your content type """
         ct_list = []
-        for collection in CollectionContentType().find( {} ):
+        for collection in CollectionContentType().find( {'user': user} ):
             ct_list.append( ( collection['_id'], collection['collection_name'] ) )
         return ct_list
     
@@ -139,7 +141,7 @@ class ModelListing( TemplateView, AppSearch ):
     template_name = "search/search.html"
     
     def get_context_data( self, **kwargs ):
-        self.form = SearchForm( self.get_app_models() )
+        self.form = SearchForm( self.get_app_models(self.request.user.username) )
         return {'form':self.form}
         
     def post( self, request, *args, **kwargs ):
@@ -147,6 +149,10 @@ class ModelListing( TemplateView, AppSearch ):
         self.build_data( self.request.POST.get( 'models' ) )
         self.get_context_data()
         return render( self.request, self.template_name, self.__dict__ )
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(ModelListing, self).dispatch(request, *args, **kwargs)
 
 class AjaxFillFields( TemplateView, AppSearch ):
 

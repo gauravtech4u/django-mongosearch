@@ -44,26 +44,35 @@ class CreateMongoCollection( object ):
         json_list = list( json_dump )
         col_obj = CollectionContentType()
         if not  col_obj.find_one( { "collection_name":self.collection_name} ):
-            col_obj.load_json( { "collection_name":self.collection_name, "key_names":{}} )
+            col_obj.load_json( { "collection_name":self.collection_name, "key_names":{}, "user": ''} )
+
+        data_obj = col_obj.find_one( { "collection_name":self.collection_name} )
+        user = data_obj['user']
+        previous_keys = data_obj['key_names']
+        pre_keys = previous_keys.keys()
+
         keys_dict = {}
         for each in json_list:
             for key in each.keys():
-                if key not in keys_dict.keys():
+                if key == 'user':
+                    user = each[key]
+                elif key not in keys_dict.keys():
                     keys_dict[key] = 1
                 else:
-                    keys_dict[key] = int( keys_dict[key] ) + 1 
-        data_obj = col_obj.find_one( { "collection_name":self.collection_name} )
-        previous_keys = data_obj['key_names']
-        pre_keys = previous_keys.keys()
+                    keys_dict[key] = int( keys_dict[key] ) + 1
+
         for new_key in keys_dict.keys():
             if new_key in pre_keys:
                 count = int( previous_keys[new_key] ) + int( keys_dict[new_key] )
                 previous_keys[new_key] = count
             else:
                 previous_keys[new_key] = keys_dict[new_key]
+
         row_data = col_obj.find_one( { "collection_name":self.collection_name} )
         row_data['key_names'] = previous_keys
-        col_obj.update( { "collection_name":self.collection_name} , {"$set":{'key_names':previous_keys}} )
+        row_data['user'] = user
+
+        col_obj.update( { "collection_name":self.collection_name} , {"$set":{'key_names':previous_keys, 'user': user}} )
         
     def update_db(self):
         json_dict=self.request.POST.get('data')
