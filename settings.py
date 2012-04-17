@@ -115,7 +115,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = ( 
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
@@ -126,12 +126,13 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    #'django.contrib.sessions',
+#    'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.staticfiles',
     'mongosearch.collector',
     'mongosearch.core',
     'mongosearch.search',
+    'auth',
 
 )
 
@@ -158,3 +159,10 @@ LOGGING = {
         },
     }
 }
+
+LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/search/'
+
+SESSION_ENGINE = 'mongoengine.django.sessions'
+
+AUTHENTICATION_BACKENDS = ('auth.models.MongoEngineBackend', )
