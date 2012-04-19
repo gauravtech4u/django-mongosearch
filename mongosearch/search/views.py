@@ -82,7 +82,7 @@ class AppSearch( object ):
         filters = self.request.POST.get( 'filters' )
         if self.request.POST.get('constraint' ):
             search_term={self.request.POST.get('constraint' ):int(search_term)}
-        self.constraint_dict = {'$and':[{filters:search_term}], }
+        self.constraint_dict = {'$or':[{filters:search_term}], }
         for i in range( 0, int( constraint_count ) ):
             constraint = self.request.POST.get( 'searchform-' + str( i ) + '-contraint' )
             term = self.request.POST.get( 'searchform-' + str( i ) + '-term' )
