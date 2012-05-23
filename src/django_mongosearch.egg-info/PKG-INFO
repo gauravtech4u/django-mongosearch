@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: django-mongosearch
+Version: 1.0
+Summary: A short URL handler for Django apps.
+Home-page: http://github.com/jacobian/django-mongosearch
+Author: Gaurav Kapoor
+Author-email: UNKNOWN
+License: BSD
+Description: UNKNOWN
+Platform: UNKNOWN

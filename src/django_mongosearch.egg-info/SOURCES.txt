@@ -1,0 +1,10 @@
+README
+setup.py
+src/django_mongosearch.egg-info/PKG-INFO
+src/django_mongosearch.egg-info/SOURCES.txt
+src/django_mongosearch.egg-info/dependency_links.txt
+src/django_mongosearch.egg-info/requires.txt
+src/django_mongosearch.egg-info/top_level.txt
+src/mongosearch/__init__.py
+src/mongosearch/tests.py
+src/mongosearch/testsettings.py
